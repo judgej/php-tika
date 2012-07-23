@@ -1,0 +1,481 @@
+<?php
+
+// TODO: lots of refactoring and tidying up, in particular separating
+// this monolithic POS into appropriate separate classes, tests etc.
+// Also a lot more (i.e. some) exception handling.
+
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+
+// A temporary file has a name and a stream.
+// The file will [usually] be deleted on exit.
+
+class temporaryFile
+{
+    // The pathname of the temporary file.
+    public $fileName;
+
+    // The w+ file handle for the temporary file.
+    public $fileStream;
+
+    // Leave blank to use system temporary directory and naming.
+    // Otherwise set a path for the required temporary file storage.
+    public $tempDir = '';
+
+    // Temporary file prefix when using own temporary directory.
+    public $prefix = '';
+
+    //
+    public function __construct($path = '', $prefix = '')
+    {
+        if (!empty($path)) $this->tempDir = $path;
+        if (!empty($prefix)) $this->prefix = $path;
+
+        if (empty($this->tempDir)) {
+            // Use system temporary file generation.
+            // This will be automatically cleaned up on exit and so is preferred.
+            $this->fileStream = tmpfile();
+            $meta = stream_get_meta_data($this->fileStream);
+            $this->fileName = $meta['uri'];
+        } else {
+            $this->fileName = tempnam($this->tempDir, $this->prefix);
+            $this->fileStream = fopen($this->fileName, 'w+');
+        }
+
+        //parent::__construct();
+    }
+
+    public function __destruct()
+    {
+        // Clean up temporary files if we were using our own directory.
+        if (!empty($this->tempDir)) {
+            fclose($this->fileStream);
+            if (file_exists($this->fileName)) unlink($this->fileName);
+        }
+    }
+}
+
+// TODO: Split Tika into two classes: "Tika" to handle the driving functionality
+// and global settings,
+// and "TikaFile" to handle the properties of a file. That way multiple files
+// can be handled at once, and data can be cleaned up by destroying the TikeFile
+// objects when finished with.
+
+class Tika
+{
+    // Temporary file defaults.
+    public static $tempDir = '';
+    public static $tempPrefix = '';
+
+    // Source document details, after caching if necessary.
+    public $sourceTemp;
+    //public $sourceStream;
+    public $sourceFilename;
+
+    // The output files from the command line: stadout and stserr.
+    // Holds temporaryFile objects.
+    public $outfile;
+    public $errfile;
+
+    // Where to find the java executable.
+    public $javaPath = '';
+    public $javaCommand = 'java';
+
+    public $tikaJar = 'tika-app-1.2.jar';
+
+    // The charset the command will be asked to return.
+    public $outputCharset = 'UTF-8';
+
+    // The last command string executed.
+    public $commandString;
+
+    // Options
+    public $prettyPrint = true;
+    public $password = '';
+    public $debug = false;
+
+    // Output data for some of the smaller commands.
+    public $output;
+
+    public $language;
+    public $type;
+    public $version;
+
+    // Return a temporary file object.
+    public static function temporaryFile()
+    {
+        return new temporaryFile(self::$tempDir, static::$tempPrefix);
+    }
+
+    // Define the source document.
+    // This can be a filename, a stream name, or an open stream.
+    // If not local, then the resource or stream will be copied to a
+    // local temporary file; we are likely to be processing it multiple
+    // times to extract the information we need from it.
+    public function defineSource($source)
+    {
+        if (is_string($source)) {
+            // Source is a string.
+            // Check whether it is a local file or remote resource.
+            // TODO: detect if the file has been uploaded, and so needs moving
+            // before it can be read.
+            if (!stream_is_local($source)) {
+                // Not local - it should be cached locally before we first use it.
+                // Let's do that now.
+                // TODO: is there somewhere static we can store the temporary file object?
+                // We want to keep it in scope until the script exits, so the temporary
+                // file is kept around until we have finished with it.
+                $this->srcTemp = $this->temporaryFile();
+
+                $src_fd = fopen($source, 'r');
+                stream_copy_to_stream($src_fd, $this->srcTemp->fileStream);
+                fclose($src_fd);
+
+                //$this->sourceStream = $this->srcTemp->fileStream;
+                $this->sourceFilename = $this->srcTemp->fileName;
+            } else {
+                // Is local - just open it.
+                $this->sourceFilename = $source;
+                //$this->sourceStream = fopen($source, 'r');
+            }
+        } else {
+            // Assume for now it is an open stream. FIXME: not a good assumption.
+            // Check if it is local.
+            $src_meta = stream_get_meta_data($source);
+            if ($src_meta['wrapper_type'] == 'plainfile') {
+                // Local.
+                //$this->sourceStream = $source;
+                $meta = stream_get_meta_data($source);
+                $this->sourceFilename = $meta['uri'];
+            } else {
+                // Not local - copy it to a local temporary file.
+                // Do not close the source stream - leave that to its owner.
+                $this->srcTemp = $this->temporaryFile();
+                stream_copy_to_stream($source, $this->srcTemp->fileStream);
+
+                //$this->sourceStream = $this->srcTemp->fileStream;
+                $this->sourceFilename = $this->srcTemp->fileName;
+            }
+        }
+
+        // Regardless of what was passed in, we return with a local filename
+        // that can be passed into the executed command-line.
+        return $this->sourceFilename;
+    }
+
+    // Run the command.
+    // We will create new output files is necessary, or reuse existing.
+    // We need to check everything is in place before the command can be executed.
+    // That includes the desired operation, characterset etc.
+    // This is a unix command line at this stage.
+    // TODO: must use escapeshellarg() or escapeshellcmd() on argumements.
+    public function executeCommand($task = 'text')
+    {
+        // True to send stdout to a file.
+        $stdoutToFile = true;
+
+        // True if a task that supports "pretty-print".
+        $ppSupport = false;
+
+        $command = array();
+        $command[] = $this->javaPath . $this->javaCommand;
+        $command[] = '-jar ' . $this->tikaJar;
+
+        if (!empty($this->outputCharset)) $command[] = '-e' . $this->outputCharset;
+
+        // TODO: extract of attachments
+        // TODO: some of these commands return just one line of text, so support
+        // getting that more easily through the exec() output parameter, so we
+        // can leave the files for big output streams.
+        // It also means a temporary outfile only needs creating for certain tasks.
+        switch ($task) {
+            case 'text':
+                $command[] = '--text'; break;
+            case 'main':
+                $command[] = '--text-main'; break;
+            case 'xml':
+                $ppSupport = true;
+                $command[] = '--xml'; break;
+            case 'html':
+                $ppSupport = true;
+                $command[] = '--html'; break;
+            case 'metadata':
+                $stdoutToFile = false;
+                $command[] = '--metadata'; break;
+            case 'json':
+                $stdoutToFile = false;
+                $command[] = '--json'; break;
+            case 'xmp':
+                $stdoutToFile = false;
+                $command[] = '--xmp'; break;
+            case 'language':
+                $stdoutToFile = false;
+                $command[] = '--language'; break;
+            case 'parsers':
+                $command[] = '--list-parsers'; break;
+            case 'parser-details':
+                $command[] = '--list-parser-details'; break;
+            case 'models':
+                $command[] = '--list-met-models'; break;
+            case 'type':
+                $stdoutToFile = false;
+                $command[] = '--detect'; break;
+            case 'types':
+                $command[] = '--list-supported-types'; break;
+            case 'version':
+                $stdoutToFile = false;
+                $command[] = '--version'; break;
+            default:
+                $command[] = $task; break;
+            case 'help':
+                $command[] = '--help'; break;
+        }
+
+        if ($this->prettyPrint && $ppSupport) $command[] = '--pretty-print';
+
+        if (!empty($this->password)) $command[] = '--password=' . $this->password;
+
+        if (!empty($this->debug)) $command[] = '--verbose';
+
+        // TODO: if the files are there, then clean them out or reset the file handle
+        // back to the start.
+        if (empty($noFile) &&empty($this->outfile)) $this->outfile = $this->temporaryFile();
+        if (empty($this->errfile)) $this->errfile = $this->temporaryFile();
+
+        $command[] = $this->sourceFilename;
+
+        // Send stdout to a file if necessary.
+        if ($stdoutToFile) $command[] =  ' >' . $this->outfile->fileName;
+
+        // Always send stderr to a file.
+        $command[] =  ' 2>' . $this->errfile->fileName;
+
+        $this->commandString = implode(' ', $command);
+        $result = exec($this->commandString, $output);
+
+        // If the result goes into a a file, then return the command result, else
+        // return the output.
+        // TODO: be consistent with the return, and put the result into a property instead.
+        if (!$stdoutToFile) {
+            $this->output = $output;
+        }
+
+        return $result;
+    }
+
+    public function getLanguage()
+    {
+        $result = $this->executeCommand('language');
+        $this->language = reset($this->output);
+        return $this->language;
+    }
+
+    public function extractText($format = 'text')
+    {
+        if (!preg_match('/^(text|main|xml|html)$/', $format)) $format = 'text';
+
+        $result = $this->executeCommand($format);
+        return $result;
+    }
+
+    public function getMetadata($format = 'json')
+    {
+        switch ($format) {
+            case ('text'):
+                $task = 'metadata';
+                break;
+            case ('json'):
+                $task = 'json';
+                break;
+            case ('xmp'):
+                $task = 'xmp';
+                break;
+            case ('array'):
+            case ('flatarray'):
+                $task = 'metadata';
+                break;
+            case ('json'):
+            default:
+                $task = 'json';
+                break;
+        }
+
+        $result = $this->executeCommand($task);
+
+        if ($format == 'array' || $format == 'flatarray') {
+            $outArray = array();
+            foreach($this->output as $element) {
+                // Skip if not in the correct format.
+                if (strpos($element, ': ') === FALSE) continue;
+
+                list($key, $value) = explode(': ', $element, 2);
+
+                if ($format == 'flatarray') {
+                    $outArray[$key] = $value;
+                } else {
+                    // Convert the foo:bar keys into nested arrays.
+                    // This technique courtesy: 
+                    // http://stackoverflow.com/questions/9628176/using-a-string-path-to-set-nested-array-data
+                    $temp = &$outArray;
+                    foreach(explode(':', $key) as $key2) {
+                        $temp = &$temp[$key2];
+                    }
+                    $temp = $value;
+                    unset($temp);
+                }
+            }
+            return $outArray;
+        }
+
+        return $this->output;
+    }
+
+    // Helper function TODOs:
+    // - Fetch metadata into a structured array
+
+    // Trim lines, collapse multiple spaces and remove blank lines from an array.
+    // TODO: support line-terminated text too.
+    // This method handles the input by reference, to cut down on memory usage.
+    // However, the array still needs to start off in memory.
+    // Maybe this can be implemented as a stream filter, to be applied to the
+    // output stream, so it can be handled line-by-line as the output file is read
+    // and not having to post-process the data.
+    public static function trimText(&$Text)
+    {
+        array_walk($Text,
+            function(&$Value, $Key) use(&$Text) {
+                // Trim spaces.
+                $Value = preg_replace('/\s+/', ' ', trim($Value));
+
+                // Remove blank elements.
+                if ($Value == '') unset($Text[$Key]);
+            }
+        );
+    }
+}
+
+?>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+</head>
+<body>
+
+<form enctype="multipart/form-data" action="" method="POST">
+    <input type="hidden" name="MAX_FILE_SIZE" value="100000" />
+    Upload a document: 
+    <input name="uploadedfile" type="file" />
+    <br />
+
+    Enter document URL: 
+    <input name="url" type="text" />
+    <br />
+
+    Local file: 
+    <label><input name="local" type="radio" value="" />None</label>
+    <?php 
+    $sample_docs_dir = __DIR__ . '/sample-docs';
+    if (is_readable(__DIR__ . '/sample-docs')) {
+        $local_files_fd = opendir(__DIR__ . '/sample-docs');
+        while($name = readdir($local_files_fd)) {
+            if ($name == '.' || $name == '..' || is_dir($sample_docs_dir .'/' . $name)) continue;
+            echo '<label><input name="local" type="radio" value="';
+            echo htmlspecialchars($name);
+            echo '" />';
+            echo htmlspecialchars($name);
+            echo '</label>';
+        }
+        closedir($local_files_fd);
+    }
+    ?>
+    <!-- <label><input name="local" type="radio" value="CV1.docx" />CV1.docx</label>
+    <label><input name="local" type="radio" value="image1.jpeg" />image1.jpeg</label> -->
+    <br />
+
+    <input type="submit" value="Process Document" />
+</form>
+
+<hr />
+
+<?php
+
+/*
+Notes
+=====
+Once a file has been uploaded, it should be possible to run several commands against
+it, such as language detection, metadata, text, etc.
+
+Rather then passing URLs into the command line, it should be downloaded and cached 
+locally. That way we do not have to fetch it multiple times for running multiple
+actions against it.
+
+The -eUTF-8 works well. Other encodings should be supported, but this should be the
+default, and not whatever the default is (appears to be ASCII).
+
+Add option to include pretty-format newlines, to help reading line at a time.
+*/
+
+// The source supplied as a stream or stream name.
+//$source = "CV1.docx";
+//$source = "http://cumulus.acadweb.co.uk/tika/CV1.docx";
+//$source = fopen($source, 'r');
+
+$tika = new Tika();
+
+$tika->javaPath = '/usr/local/jdk/bin/';
+
+if (!empty($_FILES['uploadedfile']['name'])) {var_dump($_FILES);
+    $move_to = $tika->temporaryFile();
+    if (move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $move_to->fileName)) {
+        echo "<p>Moved uploaded ".$_FILES['uploadedfile']['tmp_name']." to ".$move_to->fileName . "</p>";
+    } else {
+        echo "<p>Error in uploading file</p>";
+    }
+
+    $source = $move_to->fileName;
+} elseif (!empty($_POST['local'])) {
+    $source = '"' . $sample_docs_dir . '/' . basename($_POST['local']) . '"';
+    echo "<p>Source is local file $source</p>";
+} elseif (!empty($_POST['url'])) {
+    $source = $_POST['url'];
+    echo "<p>Source is URL $source</p>";
+}
+
+if (!empty($source)) {
+    $in_filename = $tika->defineSource($source);
+
+    //echo "<p>Language=".$tika->getLanguage()."</p>";
+
+    // Call the main task:
+    //$result = $tika->executeCommand('json');
+    //$result = $tika->extractText('main');
+    //$result = $tika->getMetadata('array');
+    $result = $tika->extractText('text');
+
+    echo "<p>result=" . print_r($result) , "</p>";
+    echo "<p>Command = $tika->commandString</p>";
+
+    // Coming out at this point we have the result code, an output file handle, 
+    // and an error file handle. These two handles are temp files, and so will
+    // be cleaned up when we exit.
+
+    $out = array();
+    while (($out[] = fgets($tika->outfile->fileStream, 4096)) !== FALSE);
+    if (!feof($tika->outfile->fileStream)) {
+        echo "Error: unexpected fgets() fail\n";
+    }
+    fclose($tika->outfile->fileStream);
+
+    Tika::trimText($out);
+
+    echo "<pre>";
+    foreach($out as $line) {
+        echo htmlspecialchars($line) . "\n";
+    }
+    //var_dump($out);
+    echo "</pre>";
+}
+?>
+<hr />
+</body>
+</html>
