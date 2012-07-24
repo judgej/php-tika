@@ -1,4 +1,21 @@
 <?php
+
+/**
+ * Still fumbling in the dark with this one.
+ * The question on the output is, should the returned output be a filename/
+ * file stream, or should it be an iterator? It makes sense being a file for
+ * the command-line version, because the output always will be a file. But
+ * if the output is not a file, but is a stream from a server process instead,
+ * then does a file make less sense? But then, perhaps we want to always dump the
+ * output into a temporary file first, and make that available to the caller to
+ * read or itterate over as it likes. The only thing we can't rely on, is loading
+ * the output into memory, as we have no idea how big it will be.
+ * Any ideas?
+ *
+ * TODO: declare GPL licence details.
+ */
+
+
 // TODO: use an autoloader
 include('Academe/Tika/TemporaryFile.php');
 include('Academe/Tika/Tika.php');
