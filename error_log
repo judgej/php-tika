@@ -1,0 +1,22 @@
+[24-Jul-2012 01:32:03 UTC] PHP Fatal error:  Undefined constant 'Academe\Tika' in /home/judgej/public_html/tika/Academe/Tika/TemporaryFile.php on line 3
+[24-Jul-2012 01:32:49 UTC] PHP Fatal error:  Undefined constant 'Academe\Tika' in /home/judgej/public_html/tika/Academe/Tika/TemporaryFile.php on line 3
+[24-Jul-2012 01:33:01 UTC] PHP Fatal error:  Undefined constant 'Academe\Tika' in /home/judgej/public_html/tika/Academe/Tika/TemporaryFile.php on line 3
+[24-Jul-2012 01:33:43 UTC] PHP Fatal error:  Undefined constant 'Academe\Tika' in /home/judgej/public_html/tika/Academe/Tika/TemporaryFile.php on line 3
+[24-Jul-2012 01:34:43 UTC] PHP Fatal error:  Undefined constant 'Academe\Tika' in /home/judgej/public_html/tika/Academe/Tika/TemporaryFile.php on line 3
+[24-Jul-2012 01:35:43 UTC] PHP Fatal error:  Undefined constant 'Academe\Tika' in /home/judgej/public_html/tika/Academe/Tika/TemporaryFile.php on line 2
+[24-Jul-2012 01:36:25 UTC] PHP Fatal error:  Class 'Tika' not found in /home/judgej/public_html/tika/test1.php on line 71
+[24-Jul-2012 01:41:15 UTC] PHP Warning:  The use statement with non-compound name 'Academe' has no effect in /home/judgej/public_html/tika/test1.php on line 5
+[24-Jul-2012 01:41:15 UTC] PHP Parse error:  syntax error, unexpected '/', expecting ',' or ';' in /home/judgej/public_html/tika/test1.php on line 5
+[24-Jul-2012 01:41:25 UTC] PHP Warning:  The use statement with non-compound name 'Academe' has no effect in /home/judgej/public_html/tika/test1.php on line 2
+[24-Jul-2012 01:41:25 UTC] PHP Parse error:  syntax error, unexpected '/', expecting ',' or ';' in /home/judgej/public_html/tika/test1.php on line 2
+[24-Jul-2012 01:41:41 UTC] PHP Warning:  The use statement with non-compound name 'Academe' has no effect in /home/judgej/public_html/tika/test1.php on line 2
+[24-Jul-2012 01:41:41 UTC] PHP Parse error:  syntax error, unexpected '/', expecting ',' or ';' in /home/judgej/public_html/tika/test1.php on line 2
+[24-Jul-2012 01:42:20 UTC] PHP Fatal error:  Class 'Academe\Tikaz\Tika' not found in /home/judgej/public_html/tika/test1.php on line 71
+[24-Jul-2012 01:42:23 UTC] PHP Fatal error:  Class 'Academe\Tikaz\Tika' not found in /home/judgej/public_html/tika/test1.php on line 71
+[24-Jul-2012 01:42:26 UTC] PHP Fatal error:  Class 'Academe\Tikaz\Tika' not found in /home/judgej/public_html/tika/test1.php on line 71
+[24-Jul-2012 01:42:28 UTC] PHP Fatal error:  Class 'Academe\Tikaz\Tika' not found in /home/judgej/public_html/tika/test1.php on line 71
+[24-Jul-2012 01:42:53 UTC] PHP Fatal error:  Class 'Academe\Tikaz\Tika' not found in /home/judgej/public_html/tika/test1.php on line 72
+[24-Jul-2012 01:42:57 UTC] PHP Fatal error:  Class 'Academe\Tikaz\Tika' not found in /home/judgej/public_html/tika/test1.php on line 72
+[24-Jul-2012 01:43:12 UTC] PHP Fatal error:  Class 'Academe\Tikaz\Tika' not found in /home/judgej/public_html/tika/test1.php on line 72
+[24-Jul-2012 01:43:38 UTC] PHP Fatal error:  Class 'Tika' not found in /home/judgej/public_html/tika/test1.php on line 118
+[24-Jul-2012 01:47:22 UTC] PHP Fatal error:  Class 'Academe\Tika' not found in /home/judgej/public_html/tika/test1.php on line 72
