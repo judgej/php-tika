@@ -12,6 +12,13 @@
  * the output into memory, as we have no idea how big it will be.
  * Any ideas?
  *
+ * Edit: I think I get it, after a good night's sleep. So long as the output
+ * class returned is inherited from the PHP iterator, then it can be used in
+ * a consistent way by the calling routine. It may iterate over an output file
+ * today, and may be a comletely different class that iterates over the output
+ * from a remote network stread - but it is still a PHP iterator that can be
+ * used in the same way.
+ *
  * TODO: declare GPL licence details.
  */
 
