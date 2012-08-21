@@ -22,11 +22,21 @@
  * TODO: declare GPL licence details.
  */
 
-
-// TODO: use an autoloader
-include('Academe/Tika/TemporaryFile.php');
-include('Academe/Tika/Tika.php');
 use Academe\Tika;
+
+//error_reporting(E_ALL);
+//ini_set('display_errors', '1');
+
+spl_autoload_register(function ($classname) {
+    $classname = ltrim($classname, "\\");
+    preg_match('/^(.+)?([^\\\\]+)$/U', $classname, $match);
+    $classname = str_replace("\\", "/", $match[1])
+        . str_replace(array("\\", "_"), "/", $match[2])
+        . ".php";
+    echo " Class=". $classname;
+    include_once $classname;
+});
+
 ?>
 <html>
 <head>
@@ -98,7 +108,7 @@ $tika = new Tika\Tika();
 $tika->javaPath = '/usr/local/jdk/bin/';
 
 if (!empty($_FILES['uploadedfile']['name'])) {var_dump($_FILES);
-    $move_to = $tika->temporaryFile();
+    $move_to = $tika->TemporaryFile();
     if (move_uploaded_file($_FILES['uploadedfile']['tmp_name'], $move_to->fileName)) {
         echo "<p>Moved uploaded ".$_FILES['uploadedfile']['tmp_name']." to ".$move_to->fileName . "</p>";
     } else {

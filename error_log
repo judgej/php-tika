@@ -20,3 +20,45 @@
 [24-Jul-2012 01:43:12 UTC] PHP Fatal error:  Class 'Academe\Tikaz\Tika' not found in /home/judgej/public_html/tika/test1.php on line 72
 [24-Jul-2012 01:43:38 UTC] PHP Fatal error:  Class 'Tika' not found in /home/judgej/public_html/tika/test1.php on line 118
 [24-Jul-2012 01:47:22 UTC] PHP Fatal error:  Class 'Academe\Tika' not found in /home/judgej/public_html/tika/test1.php on line 72
+[21-Aug-2012 08:19:46 UTC] PHP Parse error:  syntax error, unexpected '[', expecting ')' in /home/judgej/public_html/tika/test1.php on line 33
+[21-Aug-2012 08:20:57 UTC] PHP Parse error:  syntax error, unexpected '[', expecting ')' in /home/judgej/public_html/tika/test1.php on line 36
+[21-Aug-2012 08:21:18 UTC] PHP Fatal error:  Class 'Academe\Tika\Tika' not found in /home/judgej/public_html/tika/test1.php on line 107
+[21-Aug-2012 08:21:49 UTC] PHP Parse error:  syntax error, unexpected '[', expecting ')' in /home/judgej/public_html/tika/test1.php on line 36
+[21-Aug-2012 08:24:32 UTC] PHP Parse error:  syntax error, unexpected '[', expecting ')' in /home/judgej/public_html/tika/test1.php on line 36
+[21-Aug-2012 08:25:04 UTC] PHP Parse error:  syntax error, unexpected '[', expecting ')' in /home/judgej/public_html/tika/test1.php on line 36
+[21-Aug-2012 08:26:13 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/judgej/public_html/tika/test1.php on line 44
+[21-Aug-2012 08:27:51 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/judgej/public_html/tika/test1.php on line 44
+[21-Aug-2012 08:28:28 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/judgej/public_html/tika/test1.php on line 44
+[21-Aug-2012 08:28:52 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/judgej/public_html/tika/test1.php on line 44
+[21-Aug-2012 08:28:59 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/judgej/public_html/tika/test1.php on line 44
+[21-Aug-2012 08:29:02 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/judgej/public_html/tika/test1.php on line 44
+[21-Aug-2012 08:29:09 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/judgej/public_html/tika/test1.php on line 44
+[21-Aug-2012 08:29:19 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/judgej/public_html/tika/test1.php on line 44
+[21-Aug-2012 08:29:24 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/judgej/public_html/tika/test1.php on line 44
+[21-Aug-2012 08:29:26 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/judgej/public_html/tika/test1.php on line 44
+[21-Aug-2012 08:30:49 UTC] PHP Parse error:  syntax error, unexpected '}' in test1.php on line 44
+[21-Aug-2012 08:31:09 UTC] PHP Parse error:  syntax error, unexpected '}' in test1.php on line 44
+[21-Aug-2012 08:31:38 UTC] PHP Parse error:  syntax error, unexpected '}' in test1.php on line 46
+[21-Aug-2012 08:31:49 UTC] PHP Parse error:  syntax error, unexpected '}' in test1.php on line 46
+[21-Aug-2012 08:31:54 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/judgej/public_html/tika/test1.php on line 46
+[21-Aug-2012 08:32:24 UTC] PHP Parse error:  syntax error, unexpected '}' in test1.php on line 46
+[21-Aug-2012 08:32:27 UTC] PHP Parse error:  syntax error, unexpected '}' in /home/judgej/public_html/tika/test1.php on line 46
+[21-Aug-2012 08:33:13 UTC] PHP Fatal error:  Class 'Tika\Tika' not found in /home/judgej/public_html/tika/test1.php on line 107
+[21-Aug-2012 08:33:28 UTC] PHP Fatal error:  Class 'Academe\Tika\Tika' not found in /home/judgej/public_html/tika/test1.php on line 108
+[21-Aug-2012 08:33:29 UTC] PHP Fatal error:  Class 'Academe\Tika\Tika' not found in /home/judgej/public_html/tika/test1.php on line 108
+[21-Aug-2012 08:33:57 UTC] PHP Parse error:  syntax error, unexpected '[', expecting ')' in /home/judgej/public_html/tika/test1.php on line 38
+[21-Aug-2012 08:34:10 UTC] PHP Fatal error:  Class 'Academe\Tika\Tika' not found in /home/judgej/public_html/tika/test1.php on line 109
+[21-Aug-2012 08:35:05 UTC] PHP Warning:  include(classes/Academe\Tika\Tika.class.php) [<a href='function.include'>function.include</a>]: failed to open stream: No such file or directory in /home/judgej/public_html/tika/test1.php on line 31
+[21-Aug-2012 08:35:05 UTC] PHP Warning:  include() [<a href='function.include'>function.include</a>]: Failed opening 'classes/Academe\Tika\Tika.class.php' for inclusion (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/judgej/public_html/tika/test1.php on line 31
+[21-Aug-2012 08:35:05 UTC] PHP Fatal error:  Class 'Academe\Tika\Tika' not found in /home/judgej/public_html/tika/test1.php on line 114
+[21-Aug-2012 08:35:56 UTC] PHP Parse error:  syntax error, unexpected '[', expecting ')' in /home/judgej/public_html/tika/test1.php on line 43
+[21-Aug-2012 08:35:58 UTC] PHP Parse error:  syntax error, unexpected '[', expecting ')' in /home/judgej/public_html/tika/test1.php on line 43
+[21-Aug-2012 10:59:05 UTC] PHP Fatal error:  Class 'Academe\Tika\Tika' not found in /home/judgej/public_html/tika/test1.php on line 115
+[21-Aug-2012 15:01:13 UTC] PHP Parse error:  syntax error, unexpected '[', expecting ')' in /home/judgej/public_html/tika/test1.php on line 44
+[21-Aug-2012 15:04:14 UTC] PHP Parse error:  syntax error, unexpected '[', expecting ')' in /home/judgej/public_html/tika/test1.php on line 44
+[21-Aug-2012 15:06:04 UTC] PHP Warning:  include_once(Academe/Tika/temporaryFile.php) [<a href='function.include-once'>function.include-once</a>]: failed to open stream: No such file or directory in /home/judgej/public_html/tika/test1.php on line 47
+[21-Aug-2012 15:06:04 UTC] PHP Warning:  include_once() [<a href='function.include'>function.include</a>]: Failed opening 'Academe/Tika/temporaryFile.php' for inclusion (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/judgej/public_html/tika/test1.php on line 47
+[21-Aug-2012 15:06:04 UTC] PHP Fatal error:  Class 'Academe\Tika\temporaryFile' not found in /home/judgej/public_html/tika/Academe/Tika/Tika.php on line 54
+[21-Aug-2012 15:06:49 UTC] PHP Warning:  include_once(Academe/Tika/temporaryFile.php) [<a href='function.include-once'>function.include-once</a>]: failed to open stream: No such file or directory in /home/judgej/public_html/tika/test1.php on line 47
+[21-Aug-2012 15:06:49 UTC] PHP Warning:  include_once() [<a href='function.include'>function.include</a>]: Failed opening 'Academe/Tika/temporaryFile.php' for inclusion (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/judgej/public_html/tika/test1.php on line 47
+[21-Aug-2012 15:06:49 UTC] PHP Fatal error:  Class 'Academe\Tika\temporaryFile' not found in /home/judgej/public_html/tika/Academe/Tika/Tika.php on line 54

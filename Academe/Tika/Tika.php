@@ -51,7 +51,7 @@ class Tika
     // Return a temporary file object.
     public static function temporaryFile()
     {
-        return new temporaryFile(self::$tempDir, static::$tempPrefix);
+        return new TemporaryFile(self::$tempDir, static::$tempPrefix);
     }
 
     // Define the source document.
